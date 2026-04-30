@@ -1,0 +1,344 @@
+/* AW Portal — internal data-entry styles
+   Kept deliberately minimal: clean, professional, fast. */
+
+:root {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --ink: #1a2233;
+  --muted: #5a6679;
+  --line: #e3e7ee;
+  --brand: #1f4d8a;          /* firm's blue */
+  --brand-soft: #eaf1fb;
+  --green: #2f8f5b;
+  --green-soft: #e6f4ec;
+  --red: #c14242;
+  --red-soft: #fbe9e9;
+  --blue: #2f6cad;
+  --blue-soft: #e7f0fa;
+  --gray-soft: #eef0f4;
+  --warn: #b76e00;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+header.topbar {
+  background: var(--brand);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header.topbar h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+header.topbar .sub {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+main {
+  max-width: 1080px;
+  margin: 24px auto 80px;
+  padding: 0 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(20,30,50,0.04);
+}
+
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.card .hint {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 16px; }
+.grid-4 { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px 16px; align-items: end; }
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+input[type="text"], input[type="number"], input[type="date"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+}
+
+input[readonly] {
+  background: var(--gray-soft);
+  color: var(--muted);
+}
+
+input:focus {
+  outline: 2px solid var(--brand-soft);
+  border-color: var(--brand);
+}
+
+.subhead {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 16px 0 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+
+.account-row {
+  display: grid;
+  grid-template-columns: 1.6fr 0.7fr 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.account-row:last-child { border-bottom: none; }
+
+.live-totals {
+  background: var(--brand-soft);
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 18px;
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(31,77,138,0.18);
+}
+
+.live-totals .item .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.8;
+}
+.live-totals .item .val {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+button, .btn {
+  font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: #15396b; }
+.btn-secondary { background: #fff; color: var(--brand); border-color: var(--brand); }
+.btn-secondary:hover { background: var(--brand-soft); }
+
+/* Report preview page */
+.report-preview-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+@media (max-width: 1000px) {
+  .report-preview-wrap { grid-template-columns: 1fr; }
+}
+
+.report-frame {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.report-frame iframe {
+  width: 100%;
+  height: 720px;
+  border: 0;
+}
+
+.report-frame .frame-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--gray-soft);
+}
+
+.report-frame .frame-head h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--brand);
+}
+
+.banner-info {
+  background: var(--brand-soft);
+  color: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+/* ----- Flash messages -------------------------------------------------- */
+.flash {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  border: 1px solid;
+}
+.flash-success { background: #e6f4ec; color: #1d6841; border-color: #2f8f5b; }
+.flash-error   { background: #fbe9e9; color: #8a2929; border-color: #c14242; }
+.flash-warn    { background: #fff7e6; color: #8a5400; border-color: #b76e00; }
+
+/* ----- Auth (login / register) ----------------------------------------- */
+.auth-card {
+  max-width: 380px;
+  margin: 60px auto 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 4px 16px rgba(20,30,50,0.06);
+}
+.auth-card h2 { color: var(--brand); }
+
+/* ----- Client list grid ------------------------------------------------ */
+.client-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.client-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(20,30,50,0.04);
+}
+.client-card-head .name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.client-card-head .meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.client-card-body .kv {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--line);
+}
+.client-card-body .kv:last-child { border-bottom: none; }
+.client-card-body .kv span:last-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.client-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.client-card-actions .btn-primary,
+.client-card-actions .btn-secondary {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* ----- History table --------------------------------------------------- */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.history-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  background: var(--gray-soft);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.history-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.history-table tr:last-child td { border-bottom: none; }
+.history-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ----- Misc form bits used in client_edit ------------------------------ */
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+}

@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}Clients{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+  <h2 style="margin:0;">Clients <span style="color:var(--muted);font-weight:400;font-size:14px;">({{ clients|length }})</span></h2>
+  <div style="display:flex;gap:10px;">
+    {% if clients|length == 0 %}
+      <form method="post" action="{{ url_for('seed_demo') }}" style="margin:0;">
+        <button class="btn-secondary">Seed demo client</button>
+      </form>
+    {% endif %}
+    <a href="{{ url_for('client_new') }}" class="btn-primary">+ New client</a>
+  </div>
+</div>
+
+{% if clients|length == 0 %}
+  <div class="card" style="text-align:center;padding:48px;">
+    <p style="font-size:16px;color:var(--muted);">No clients yet.</p>
+    <p style="margin-top:18px;">
+      <a href="{{ url_for('client_new') }}" class="btn-primary">Create your first client</a>
+      &nbsp;or&nbsp;
+      <form method="post" action="{{ url_for('seed_demo') }}" style="display:inline;margin:0;">
+        <button class="btn-secondary">Seed demo client</button>
+      </form>
+    </p>
+  </div>
+{% else %}
+  <div class="client-grid">
+    {% for c in clients %}
+      <div class="client-card">
+        <div class="client-card-head">
+          <div>
+            <div class="name">{{ c.c1_name }}{% if c.c2_name %} &amp; {{ c.c2_name }}{% endif %}</div>
+            <div class="meta">
+              {% if c.last_report_at %}
+                Last report: {{ c.last_report_at }}
+              {% else %}
+                <span style="color:var(--warn);">No reports yet</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="client-card-body">
+          <div class="kv"><span>Monthly inflow</span><span>${{ "{:,.0f}".format(c.c1_monthly_salary + c.c2_monthly_salary) }}</span></div>
+          <div class="kv"><span>Monthly outflow</span><span>${{ "{:,.0f}".format(c.monthly_outflow) }}</span></div>
+        </div>
+
+        <div class="client-card-actions">
+          <a href="{{ url_for('client_report', client_id=c.id) }}" class="btn-primary" style="flex:1;text-align:center;">Generate report →</a>
+          <a href="{{ url_for('client_edit', client_id=c.id) }}" class="btn-secondary">Edit</a>
+          <a href="{{ url_for('client_history', client_id=c.id) }}" class="btn-secondary">History</a>
+          <form method="post" action="{{ url_for('client_delete', client_id=c.id) }}"
+                onsubmit="return confirm('Delete {{ c.c1_name }}? This is permanent.');"
+                style="margin:0;">
+            <button class="btn-secondary" style="color:var(--red);border-color:var(--red);">Delete</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

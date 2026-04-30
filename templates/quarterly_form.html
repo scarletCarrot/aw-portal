@@ -1,0 +1,172 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}Quarterly report · {{ client.client_1.name }}{% if client.client_2.name %} &amp; {{ client.client_2.name }}{% endif %}{% endblock %}
+
+{% block content %}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+  <h2 style="margin:0;">Generate report · {{ client.client_1.name }}{% if client.client_2.name %} &amp; {{ client.client_2.name }}{% endif %}</h2>
+  <div>
+    <a href="{{ url_for('client_edit', client_id=client.id) }}" class="btn-secondary">Edit profile</a>
+    <a href="{{ url_for('clients_list') }}" class="btn-secondary">← Clients</a>
+  </div>
+</div>
+
+<div class="banner-info">
+  {% if prefilled_from_history %}
+    Pre-filled from this client's <strong>most recent report</strong>. Update only what changed this quarter.
+  {% else %}
+    First report for this client — fields start empty. The sticky bar at the bottom shows live totals.
+  {% endif %}
+</div>
+
+<form method="post" id="reportForm">
+
+  <!-- Retirement: Client 1 -->
+  <div class="card">
+    <h2>Client 1 retirement balances</h2>
+    {% for acct in client.client_1.retirement_accounts %}
+    <div class="account-row">
+      <div><label>Type</label><input type="text" value="{{ acct.type }}" readonly></div>
+      <div><label>Last 4</label><input type="text" value="{{ acct.last4 or '' }}" readonly></div>
+      <div>
+        <label>Balance ($)</label>
+        <input type="number" step="0.01" class="c1-ret" name="c1_ret_balance_{{ loop.index0 }}"
+               value="{{ defaults.c1_ret_balances[loop.index0] or '' }}" required>
+      </div>
+      <div>
+        <label>Cash bal. (opt)</label>
+        <input type="number" step="0.01" name="c1_ret_cash_{{ loop.index0 }}"
+               value="{{ defaults.c1_ret_cash[loop.index0] or '' }}">
+      </div>
+    </div>
+    {% else %}
+      <p class="hint">No retirement accounts on file. <a href="{{ url_for('client_edit', client_id=client.id) }}">Add some →</a></p>
+    {% endfor %}
+  </div>
+
+  <!-- Retirement: Client 2 -->
+  {% if client.client_2.retirement_accounts %}
+  <div class="card">
+    <h2>Client 2 retirement balances</h2>
+    {% for acct in client.client_2.retirement_accounts %}
+    <div class="account-row">
+      <div><label>Type</label><input type="text" value="{{ acct.type }}" readonly></div>
+      <div><label>Last 4</label><input type="text" value="{{ acct.last4 or '' }}" readonly></div>
+      <div>
+        <label>Balance ($)</label>
+        <input type="number" step="0.01" class="c2-ret" name="c2_ret_balance_{{ loop.index0 }}"
+               value="{{ defaults.c2_ret_balances[loop.index0] or '' }}" required>
+      </div>
+      <div>
+        <label>Cash bal. (opt)</label>
+        <input type="number" step="0.01" name="c2_ret_cash_{{ loop.index0 }}"
+               value="{{ defaults.c2_ret_cash[loop.index0] or '' }}">
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Non-retirement -->
+  <div class="card">
+    <h2>Non-retirement (joint) balances</h2>
+    <p class="hint">Includes the SACS bank accounts. Trust is entered separately below.</p>
+    {% for acct in client.non_retirement_accounts %}
+    <div class="account-row">
+      <div><label>Type</label><input type="text" value="{{ acct.type }}{% if acct.is_sacs %} · {{ acct.is_sacs }}{% endif %}" readonly></div>
+      <div><label>Last 4</label><input type="text" value="{{ acct.last4 or '' }}" readonly></div>
+      <div>
+        <label>Balance ($)</label>
+        <input type="number" step="0.01" class="non-ret" name="non_ret_balance_{{ loop.index0 }}"
+               value="{{ defaults.non_ret_balances[loop.index0] or '' }}" required>
+      </div>
+      <div>
+        <label>Cash bal. (opt)</label>
+        <input type="number" step="0.01" name="non_ret_cash_{{ loop.index0 }}"
+               value="{{ defaults.non_ret_cash[loop.index0] or '' }}">
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Trust -->
+  <div class="card">
+    <h2>Trust — Zillow value</h2>
+    <p class="hint">Property: {{ client.trust.property_address or '— address not set —' }}</p>
+    <div class="grid-2">
+      <div>
+        <label>Zillow Zestimate ($)</label>
+        <input type="number" step="0.01" id="trust_value" name="trust_zillow"
+               value="{{ defaults.trust_zillow or '' }}" required>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liabilities -->
+  {% if client.liabilities %}
+  <div class="card">
+    <h2>Liability balances</h2>
+    {% for liab in client.liabilities %}
+    <div class="account-row">
+      <div><label>Type</label><input type="text" value="{{ liab.type }}" readonly></div>
+      <div><label>Interest rate</label><input type="text" value="{{ liab.interest_rate }}%" readonly></div>
+      <div>
+        <label>Balance ($)</label>
+        <input type="number" step="0.01" class="liability" name="liability_balance_{{ loop.index0 }}"
+               value="{{ defaults.liability_balances[loop.index0] or '' }}" required>
+      </div>
+      <div></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="actions">
+    <button type="reset" class="btn-secondary">Reset</button>
+    <button type="submit" class="btn-primary">Generate report →</button>
+  </div>
+
+  <!-- Sticky live totals -->
+  <div class="live-totals">
+    <div class="item"><div class="lbl">Monthly excess</div><div class="val" id="t_excess">$0</div></div>
+    <div class="item"><div class="lbl">Reserve target</div><div class="val" id="t_target">$0</div></div>
+    <div class="item"><div class="lbl">Net worth</div><div class="val" id="t_networth">$0</div></div>
+    <div class="item"><div class="lbl">Liabilities (separate)</div><div class="val" id="t_liab">$0</div></div>
+  </div>
+</form>
+
+<script>
+  const fmt = n => '$' + (n || 0).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+  const num = el => parseFloat(el.value) || 0;
+  const sumClass = cls => Array.from(document.querySelectorAll('.' + cls)).reduce((a, el) => a + num(el), 0);
+
+  // Static figures from server-rendered client config
+  const inflow  = {{ client.client_1.monthly_salary + client.client_2.monthly_salary }};
+  const outflow = {{ client.sacs_budget.monthly_outflow }};
+  const dedAuto   = {{ client.sacs_budget.insurance_deductibles.auto }};
+  const dedHome   = {{ client.sacs_budget.insurance_deductibles.home }};
+  const dedHealth = {{ client.sacs_budget.insurance_deductibles.health }};
+
+  function recompute() {
+    const excess = inflow - outflow;
+    const target = (6 * outflow) + dedAuto + dedHome + dedHealth;
+
+    const c1Ret  = sumClass('c1-ret');
+    const c2Ret  = sumClass('c2-ret');
+    const nonRet = sumClass('non-ret');
+    const trust  = num(document.getElementById('trust_value'));
+    const liab   = sumClass('liability');
+
+    const netWorth = c1Ret + c2Ret + nonRet + trust;
+
+    document.getElementById('t_excess').textContent   = fmt(excess);
+    document.getElementById('t_target').textContent   = fmt(target);
+    document.getElementById('t_networth').textContent = fmt(netWorth);
+    document.getElementById('t_liab').textContent     = fmt(liab);
+  }
+
+  document.querySelectorAll('input[type="number"]').forEach(el => el.addEventListener('input', recompute));
+  recompute();
+</script>
+{% endblock %}

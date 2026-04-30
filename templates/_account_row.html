@@ -1,0 +1,25 @@
+{# Reusable row for editing a retirement / non-retirement account.
+   Required vars: a (account dict).  Optional: prefix (defaults c1_ret), with_sacs (bool). #}
+{% set prefix = prefix | default("c1_ret") %}
+{% set with_sacs = with_sacs | default(False) %}
+
+<div class="account-row">
+  <div><label>Type</label><input type="text" name="{{ prefix }}_type[]" value="{{ a.type or '' }}" required></div>
+  <div><label>Last 4</label><input type="text" name="{{ prefix }}_last4[]" maxlength="4" value="{{ a.last4 or '' }}"></div>
+
+  {% if with_sacs %}
+  <div>
+    <label>SACS role</label>
+    <select name="{{ prefix }}_is_sacs[]">
+      <option value=""                {% if not a.is_sacs %}selected{% endif %}>— none —</option>
+      <option value="inflow"          {% if a.is_sacs == 'inflow' %}selected{% endif %}>Inflow</option>
+      <option value="outflow"         {% if a.is_sacs == 'outflow' %}selected{% endif %}>Outflow</option>
+      <option value="private_reserve" {% if a.is_sacs == 'private_reserve' %}selected{% endif %}>Private Reserve</option>
+    </select>
+  </div>
+  {% endif %}
+
+  <div style="display:flex;align-items:end;">
+    <button type="button" class="btn-secondary remove-row" style="color:var(--red);border-color:var(--red);">Remove</button>
+  </div>
+</div>

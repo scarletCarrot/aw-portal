@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}{% if client %}Edit client{% else %}New client{% endif %}{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+  <h2 style="margin:0;">
+    {% if client %}Edit · {{ client.client_1.name }}{% else %}New client{% endif %}
+  </h2>
+  <a href="{{ url_for('clients_list') }}" class="btn-secondary">← Back</a>
+</div>
+
+<form method="post">
+  <!-- Client 1 -->
+  <div class="card">
+    <h2>Client 1</h2>
+    <p class="hint">Required.</p>
+    <div class="grid-3">
+      <div>
+        <label>Name</label>
+        <input type="text" name="c1_name" required value="{{ client and client.client_1.name or '' }}">
+      </div>
+      <div>
+        <label>Date of birth</label>
+        <input type="date" name="c1_dob" value="{{ client and client.client_1.dob or '' }}">
+      </div>
+      <div>
+        <label>SSN (last 4)</label>
+        <input type="text" name="c1_ssn_last4" maxlength="4" value="{{ client and client.client_1.ssn_last4 or '' }}">
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px;">
+      <div>
+        <label>Monthly take-home pay ($)</label>
+        <input type="number" step="0.01" name="c1_monthly_salary" value="{{ client and client.client_1.monthly_salary or '0' }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- Client 2 -->
+  <div class="card">
+    <h2>Client 2 (spouse — optional)</h2>
+    <div class="grid-3">
+      <div>
+        <label>Name</label>
+        <input type="text" name="c2_name" value="{{ client and client.client_2.name or '' }}">
+      </div>
+      <div>
+        <label>Date of birth</label>
+        <input type="date" name="c2_dob" value="{{ client and client.client_2.dob or '' }}">
+      </div>
+      <div>
+        <label>SSN (last 4)</label>
+        <input type="text" name="c2_ssn_last4" maxlength="4" value="{{ client and client.client_2.ssn_last4 or '' }}">
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:12px;">
+      <div>
+        <label>Monthly take-home pay ($)</label>
+        <input type="number" step="0.01" name="c2_monthly_salary" value="{{ client and client.client_2.monthly_salary or '0' }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- SACS budget (static) -->
+  <div class="card">
+    <h2>SACS budget</h2>
+    <p class="hint">Static fields — change rarely. Floor stays at $1,000 per Rebecca's spec.</p>
+    <div class="grid-4">
+      <div>
+        <label>Monthly outflow ($)</label>
+        <input type="number" step="0.01" name="monthly_outflow" value="{{ client and client.sacs_budget.monthly_outflow or '0' }}">
+      </div>
+      <div>
+        <label>Floor ($)</label>
+        <input type="number" step="0.01" name="floor" value="{{ client and client.sacs_budget.floor or '1000' }}">
+      </div>
+      <div>
+        <label>Auto deductible ($)</label>
+        <input type="number" step="0.01" name="ded_auto" value="{{ client and client.sacs_budget.insurance_deductibles.auto or '0' }}">
+      </div>
+      <div>
+        <label>Home deductible ($)</label>
+        <input type="number" step="0.01" name="ded_home" value="{{ client and client.sacs_budget.insurance_deductibles.home or '0' }}">
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px;">
+      <div>
+        <label>Health deductible ($)</label>
+        <input type="number" step="0.01" name="ded_health" value="{{ client and client.sacs_budget.insurance_deductibles.health or '0' }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- Retirement accounts: Client 1 -->
+  <div class="card">
+    <h2>Client 1 retirement accounts</h2>
+    <p class="hint">IRA, Roth IRA, 401K, pension etc. Top half of the TCC.</p>
+    <div id="c1-ret-rows">
+      {% if client %}
+        {% for a in client.client_1.retirement_accounts %}
+          {% include "_account_row.html" with context %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="button" class="btn-secondary" data-add-row="c1-ret">+ Add account</button>
+  </div>
+
+  <!-- Retirement accounts: Client 2 -->
+  <div class="card">
+    <h2>Client 2 retirement accounts</h2>
+    <div id="c2-ret-rows">
+      {% if client %}
+        {% for a in client.client_2.retirement_accounts %}
+          {% set prefix = "c2_ret" %}
+          {% include "_account_row.html" with context %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="button" class="btn-secondary" data-add-row="c2-ret">+ Add account</button>
+  </div>
+
+  <!-- Non-retirement -->
+  <div class="card">
+    <h2>Non-retirement (joint) accounts</h2>
+    <p class="hint">Brokerage and the SACS bank accounts (Inflow / Outflow / Private Reserve). Mark the bank accounts so SACS knows which is which.</p>
+    <div id="non-ret-rows">
+      {% if client %}
+        {% for a in client.non_retirement_accounts %}
+          {% set prefix = "non_ret" %}
+          {% set with_sacs = True %}
+          {% include "_account_row.html" with context %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="button" class="btn-secondary" data-add-row="non-ret">+ Add account</button>
+  </div>
+
+  <!-- Trust -->
+  <div class="card">
+    <h2>Trust</h2>
+    <div class="grid-2">
+      <div>
+        <label>Property address</label>
+        <input type="text" name="trust_address" value="{{ client and client.trust.property_address or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <!-- Liabilities -->
+  <div class="card">
+    <h2>Liabilities</h2>
+    <p class="hint">Displayed separately on the TCC. Never subtracted from net worth.</p>
+    <div id="liability-rows">
+      {% if client %}
+        {% for l in client.liabilities %}
+          <div class="account-row">
+            <div><label>Type</label><input type="text" name="liability_type[]" value="{{ l.type }}"></div>
+            <div><label>Interest rate (%)</label><input type="number" step="0.01" name="liability_rate[]" value="{{ l.interest_rate }}"></div>
+            <div></div>
+            <div style="display:flex;align-items:end;"><button type="button" class="btn-secondary remove-row" style="color:var(--red);border-color:var(--red);">Remove</button></div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="button" class="btn-secondary" data-add-liability>+ Add liability</button>
+  </div>
+
+  <div class="actions">
+    <a href="{{ url_for('clients_list') }}" class="btn-secondary">Cancel</a>
+    <button type="submit" class="btn-primary">{% if client %}Save changes{% else %}Create client{% endif %}</button>
+  </div>
+</form>
+
+<script>
+  // Add new account row
+  function makeAccountRow(prefix, withSacs) {
+    const wrap = document.createElement('div');
+    wrap.className = 'account-row';
+    let sacsInput = '';
+    if (withSacs) {
+      sacsInput = `
+        <div>
+          <label>SACS role</label>
+          <select name="${prefix}_is_sacs[]">
+            <option value="">— none —</option>
+            <option value="inflow">Inflow</option>
+            <option value="outflow">Outflow</option>
+            <option value="private_reserve">Private Reserve</option>
+          </select>
+        </div>`;
+    }
+    wrap.innerHTML = `
+      <div><label>Type</label><input type="text" name="${prefix}_type[]" placeholder="e.g. Roth IRA"></div>
+      <div><label>Last 4</label><input type="text" name="${prefix}_last4[]" maxlength="4"></div>
+      ${sacsInput}
+      <div style="display:flex;align-items:end;"><button type="button" class="btn-secondary remove-row" style="color:var(--red);border-color:var(--red);">Remove</button></div>
+    `;
+    return wrap;
+  }
+
+  document.querySelectorAll('[data-add-row]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.addRow;
+      const prefixMap = { 'c1-ret': 'c1_ret', 'c2-ret': 'c2_ret', 'non-ret': 'non_ret' };
+      const withSacs = key === 'non-ret';
+      const wrap = document.getElementById(key + '-rows');
+      wrap.appendChild(makeAccountRow(prefixMap[key], withSacs));
+    });
+  });
+
+  document.querySelector('[data-add-liability]').addEventListener('click', () => {
+    const wrap = document.getElementById('liability-rows');
+    const div = document.createElement('div');
+    div.className = 'account-row';
+    div.innerHTML = `
+      <div><label>Type</label><input type="text" name="liability_type[]" placeholder="e.g. Mortgage"></div>
+      <div><label>Interest rate (%)</label><input type="number" step="0.01" name="liability_rate[]"></div>
+      <div></div>
+      <div style="display:flex;align-items:end;"><button type="button" class="btn-secondary remove-row" style="color:var(--red);border-color:var(--red);">Remove</button></div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  // Delegated remove handler
+  document.addEventListener('click', e => {
+    if (e.target.classList && e.target.classList.contains('remove-row')) {
+      e.target.closest('.account-row').remove();
+    }
+  });
+</script>
+{% endblock %}

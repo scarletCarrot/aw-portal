@@ -1,0 +1,82 @@
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments --------------------------------------------------
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Database (SQLite) ------------------------------------------------------
+# Local DB is per-developer; never commit user data.
+aw_portal.db
+aw_portal.db-journal
+aw_portal.db-wal
+aw_portal.db-shm
+*.sqlite
+*.sqlite3
+
+# --- Secrets / env ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.secret
+
+# --- Flask -----------------------------------------------------------------
+instance/
+.flaskenv
+
+# --- Playwright ------------------------------------------------------------
+# Browsers are downloaded by `playwright install chromium` per-machine.
+.playwright/
+playwright-report/
+test-results/
+
+# --- Generated sample outputs ----------------------------------------------
+# These are produced by smoke tests, not source.
+sample_SACS.pdf
+sample_TCC.pdf
+sacs-*.png
+tcc-*.png
+
+# --- Editors / IDEs --------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# --- Operating system noise ------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Logs ------------------------------------------------------------------
+*.log
+logs/
+
+# --- Local notes (don't ship private review notes) -------------------------
+NOTES.md
+TODO.md
+scratch/

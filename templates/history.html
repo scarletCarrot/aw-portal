@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}History · {{ client.client_1.name }}{% endblock %}
+
+{% block content %}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+  <h2 style="margin:0;">Report history · {{ client.client_1.name }}{% if client.client_2.name %} &amp; {{ client.client_2.name }}{% endif %}</h2>
+  <div>
+    <a href="{{ url_for('client_report', client_id=client.id) }}" class="btn-primary">+ New report</a>
+    <a href="{{ url_for('clients_list') }}" class="btn-secondary">← Clients</a>
+  </div>
+</div>
+
+{% if history|length == 0 %}
+  <div class="card" style="text-align:center;padding:48px;">
+    <p style="font-size:16px;color:var(--muted);">No reports generated for this client yet.</p>
+    <p style="margin-top:18px;">
+      <a href="{{ url_for('client_report', client_id=client.id) }}" class="btn-primary">Generate the first report →</a>
+    </p>
+  </div>
+{% else %}
+
+<div class="card" style="padding:0;overflow:hidden;">
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Generated</th>
+        <th>By</th>
+        <th>Net worth</th>
+        <th>Excess / mo</th>
+        <th>Liabilities</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in history %}
+      <tr>
+        <td>#{{ r.id }}</td>
+        <td>{{ r.generated_at }}</td>
+        <td>{{ r.generated_by_email or '—' }}</td>
+        <td class="num">${{ "{:,.2f}".format(r.computed.tcc.grand_total_net_worth) }}</td>
+        <td class="num">${{ "{:,.2f}".format(r.computed.sacs.monthly_excess) }}</td>
+        <td class="num" style="color:var(--red);">${{ "{:,.2f}".format(r.computed.tcc.liabilities_total) }}</td>
+        <td style="text-align:right;white-space:nowrap;">
+          <a href="{{ url_for('historic_sacs_pdf', report_id=r.id) }}" class="btn-secondary" style="padding:4px 10px;font-size:12px;">SACS PDF</a>
+          <a href="{{ url_for('historic_tcc_pdf',  report_id=r.id) }}" class="btn-secondary" style="padding:4px 10px;font-size:12px;">TCC PDF</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endif %}
+
+{% endblock %}

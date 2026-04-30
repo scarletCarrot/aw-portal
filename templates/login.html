@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}Sign in{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h2 style="margin-top:0;">Log in</h2>
+  <p class="hint">Use your firm email.</p>
+
+  <form method="post">
+    <div style="margin-bottom:14px;">
+      <label>Email</label>
+      <input type="email" name="email" value="{{ email or '' }}" required autofocus>
+    </div>
+    <div style="margin-bottom:18px;">
+      <label>Password</label>
+      <input type="password" name="password" required>
+    </div>
+    <button type="submit" class="btn-primary" style="width:100%;">Log in</button>
+  </form>
+
+  <div style="margin-top:18px;font-size:12px;color:var(--muted);text-align:center;">
+    No account yet? <a href="{{ url_for('auth.register') }}">Register</a>
+    <span style="opacity:0.7;">(invite-only after the first user)</span>
+  </div>
+</div>
+{% endblock %}

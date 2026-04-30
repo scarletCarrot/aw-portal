@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block subtitle %}Generated reports · {{ client.client_1.name }}{% endblock %}
+
+{% block content %}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+  <h2 style="margin:0;">Reports for {{ client.client_1.name }}{% if client.client_2.name %} &amp; {{ client.client_2.name }}{% endif %} · {{ today }}</h2>
+  <div>
+    <a href="{{ url_for('client_report', client_id=client.id) }}" class="btn-secondary">← Edit data</a>
+    <a href="{{ url_for('clients_list') }}" class="btn-secondary">All clients</a>
+  </div>
+</div>
+
+<div class="banner-info">
+  Saved to history (report #{{ report_id }}). Preview below — download as PDF or open the HTML in a new tab.
+</div>
+
+<div class="actions" style="justify-content:flex-start;gap:10px;">
+  <a class="btn-primary"   href="{{ url_for('client_sacs_pdf', client_id=client.id) }}">⬇ Download SACS PDF</a>
+  <a class="btn-primary"   href="{{ url_for('client_tcc_pdf',  client_id=client.id) }}">⬇ Download TCC PDF</a>
+  <a class="btn-secondary" href="{{ url_for('client_sacs_html', client_id=client.id) }}" target="_blank">Open SACS HTML</a>
+  <a class="btn-secondary" href="{{ url_for('client_tcc_html',  client_id=client.id) }}" target="_blank">Open TCC HTML</a>
+</div>
+
+<div class="report-preview-wrap">
+  <div class="report-frame">
+    <div class="frame-head">
+      <h3>SACS — Cash Flow</h3>
+      <a href="{{ url_for('client_sacs_pdf', client_id=client.id) }}" class="btn-secondary" style="padding:4px 10px;font-size:12px;">PDF</a>
+    </div>
+    <iframe src="{{ url_for('client_sacs_html', client_id=client.id) }}"></iframe>
+  </div>
+
+  <div class="report-frame">
+    <div class="frame-head">
+      <h3>TCC — Net Worth</h3>
+      <a href="{{ url_for('client_tcc_pdf', client_id=client.id) }}" class="btn-secondary" style="padding:4px 10px;font-size:12px;">PDF</a>
+    </div>
+    <iframe src="{{ url_for('client_tcc_html', client_id=client.id) }}"></iframe>
+  </div>
+</div>
+
+<div class="card" style="margin-top:24px;">
+  <h2>Summary</h2>
+  <div class="grid-4">
+    <div><label>Monthly excess</label><div style="font-size:18px;font-weight:700;">${{ "{:,.2f}".format(report.sacs.monthly_excess) }}</div></div>
+    <div><label>Reserve target</label><div style="font-size:18px;font-weight:700;">${{ "{:,.2f}".format(report.sacs.private_reserve_target) }}</div></div>
+    <div><label>Net worth</label><div style="font-size:18px;font-weight:700;color:var(--brand);">${{ "{:,.2f}".format(report.tcc.grand_total_net_worth) }}</div></div>
+    <div><label>Liabilities (separate)</label><div style="font-size:18px;font-weight:700;color:var(--red);">${{ "{:,.2f}".format(report.tcc.liabilities_total) }}</div></div>
+  </div>
+</div>
+
+{% endblock %}
