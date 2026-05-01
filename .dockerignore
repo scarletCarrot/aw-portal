@@ -1,0 +1,39 @@
+# Don't ship local junk into the production image.
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual envs
+venv/
+.venv/
+env/
+
+# Local DB (each environment gets its own)
+aw_portal.db
+aw_portal.db-journal
+*.sqlite
+
+# Generated artifacts
+sample_*.pdf
+sacs-*.png
+tcc-*.png
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Git
+.git/
+.gitignore
+
+# Docs not needed at runtime
+loom_script.md
+DEPLOY.md
